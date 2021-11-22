@@ -21,7 +21,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     last_login = models.DateTimeField('дата последнего входа', auto_now=True)
     date_joined = models.DateTimeField('дата регистрации', auto_now_add=True)
 
-    is_staff = models.BooleanField('персонал', default=False)
+    is_staff = models.BooleanField('сотрудник', default=False)
     is_active = models.BooleanField('активен', default=True)
 
     USERNAME_FIELD = 'phone'
@@ -30,7 +30,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     def __str__(self):
-        return self.phone
+        return str(self.phone)
 
     def get_short_name(self):
         return self.first_name
@@ -53,7 +53,7 @@ class Customer(User):
     timezone = TimeZoneField('часовой пояс', default='Europe/Moscow', choices_display='WITH_GMT_OFFSET')
 
     def __str__(self):
-        return self.get_full_name()
+        return self.pub_id
 
     def get_full_name(self):
         return f'{self.last_name} {self.first_name} {self.patronymic}'
@@ -93,4 +93,40 @@ class AdditionalEmail(models.Model):
         verbose_name_plural = 'Дополнительные E-mail'
 
 
+class SocialNetwork(models.Model):
+    customer = models.OneToOneField(Customer, verbose_name='клиент', on_delete=models.CASCADE)
+    instagram = models.URLField('instagram', max_length=255)
+    telegram = models.CharField('telegram', max_length=25)
+    whatsapp = models.CharField('whatsApp', max_length=25)
+    viber = models.CharField('viber', max_length=25)
 
+    def __str__(self):
+        return f'Социальные сети пользователя {self.customer}'
+
+    class Meta:
+        verbose_name = 'социальная сеть'
+        verbose_name_plural = 'Социальные сети'
+
+
+class Vkontakte(models.Model):
+    social_network = models.ForeignKey(SocialNetwork, verbose_name='социальная сеть', on_delete=models.CASCADE)
+    url = models.URLField('ссылка', max_length=255)
+
+    def __str__(self):
+        return self.url
+
+    class Meta:
+        verbose_name = 'вконтакте'
+        verbose_name_plural = 'Вконтакте'
+
+
+class Facebook(models.Model):
+    social_network = models.ForeignKey(SocialNetwork, verbose_name='социальная сеть', on_delete=models.CASCADE)
+    url = models.URLField('ссылка', max_length=255)
+
+    def __str__(self):
+        return self.url
+
+    class Meta:
+        verbose_name = 'facebook'
+        verbose_name_plural = 'Facebooks'
