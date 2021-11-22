@@ -11,25 +11,25 @@ admin.site.register(AdditionalEmail)
 admin.site.register(AdditionalPhoneNumber)
 
 
-class AdditionalEmailInline(admin.StackedInline):
+class AdditionalEmailInline(NestedStackedInline):
     model = AdditionalEmail
-    extra = 0
+    extra = 1
 
 
-class AdditionalPhoneNumberInline(admin.StackedInline):
+class AdditionalPhoneNumberInline(NestedStackedInline):
     model = AdditionalPhoneNumber
-    extra = 0
+    extra = 1
 
 
 class VkontakteInline(NestedStackedInline):
     model = Vkontakte
-    extra = 0
+    extra = 1
     fk_name = 'social_network'
 
 
 class FacebookInline(NestedStackedInline):
     model = Facebook
-    extra = 0
+    extra = 1
     fk_name = 'social_network'
 
 
