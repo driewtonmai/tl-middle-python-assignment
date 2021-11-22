@@ -14,7 +14,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     """Base user model"""
 
     phone = PhoneNumberField('номер телефона', unique=True)
-    email = models.EmailField('e-mail', max_length=255)
+    email = models.EmailField('e-mail', max_length=255, unique=True)
     first_name = models.CharField('имя', max_length=255)
     last_name = models.CharField('фамилие', max_length=255)
 
@@ -79,5 +79,18 @@ class AdditionalPhoneNumber(models.Model):
     class Meta:
         verbose_name = 'дополнительный номер'
         verbose_name_plural = 'Дополнительные номера'
+
+
+class AdditionalEmail(models.Model):
+    email = models.EmailField('e-mail', max_length=255, unique=True)
+    customer = models.ForeignKey(Customer, verbose_name='клиент', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.email
+
+    class Meta:
+        verbose_name = 'дополнительный E-mail'
+        verbose_name_plural = 'Дополнительные E-mail'
+
 
 
