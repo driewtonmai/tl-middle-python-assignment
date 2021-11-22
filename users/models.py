@@ -67,3 +67,17 @@ class Customer(User):
         ordering = ['-date_joined']
         verbose_name = 'клиент'
         verbose_name_plural = 'Клиенты'
+
+
+class AdditionalPhoneNumber(models.Model):
+    phone = PhoneNumberField('дополнительный номер телефона', unique=True)
+    customer = models.ForeignKey(Customer, verbose_name='клиент', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return str(self.phone)
+
+    class Meta:
+        verbose_name = 'дополнительный номер'
+        verbose_name_plural = 'Дополнительные номера'
+
+
