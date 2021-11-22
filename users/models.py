@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.base_user import AbstractBaseUser
+from django.db.models.signals import pre_save, pre_init, post_init, post_save
+from django.dispatch import receiver
 from django.utils import timezone
 
 from phonenumber_field.modelfields import PhoneNumberField
@@ -37,17 +39,17 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     class Meta:
         ordering = ['-date_joined']
-        verbose_name = 'пользователь'
-        verbose_name_plural = 'Пользователи'
+        verbose_name = 'сотрудник'
+        verbose_name_plural = 'Сотрудники'
 
 
 class Customer(User):
     """Model for the customer user"""
 
-    pub_id = models.CharField('идентификатор клиента', unique=True, max_length=50, editable=False)
+    pub_id = models.CharField('идентификатор клиента', max_length=50, editable=False)
     patronymic = models.CharField('отчество', max_length=255)
     status = models.IntegerField('статус', choices=StatusChoices.choices)
-    status_changed_date = models.DateTimeField('дата изменения статуса', editable=False, null=True)
+    status_changed_date = models.DateTimeField('дата изменения статуса', editable=False, default=timezone.now)
     type = models.IntegerField('тип', choices=TypeChoices.choices)
     sex = models.IntegerField('пол', choices=SexChoices.choices)
     timezone = TimeZoneField('часовой пояс', default='Europe/Moscow', choices_display='WITH_GMT_OFFSET')
@@ -59,9 +61,12 @@ class Customer(User):
         return f'{self.last_name} {self.first_name} {self.patronymic}'
 
     def save(self, *args, **kwargs):
-        if not self.id:
-            self.pub_id = f'{self.id}01'
-        return super(Customer, self).save(*args, **kwargs)
+        if self.id:
+            previous = Customer.objects.only('status').get(id=self.id)
+            if previous.status != self.status:
+                self.status_changed_date = timezone.now()
+
+        super().save(*args, **kwargs)
 
     class Meta:
         ordering = ['-date_joined']
@@ -69,12 +74,18 @@ class Customer(User):
         verbose_name_plural = 'Клиенты'
 
 
+@receiver(post_save, sender=Customer)
+def create_pub_id(sender, instance, created, **kwargs):
+    if created:
+        customer = Customer.objects.filter(id=instance.id).update(pub_id=f'{instance.id}01')
+
+
 class AdditionalPhoneNumber(models.Model):
     phone = PhoneNumberField('дополнительный номер телефона', unique=True)
     customer = models.ForeignKey(Customer, verbose_name='клиент', on_delete=models.CASCADE)
 
     def __str__(self):
-        return str(self.phone)
+        return f'Дополнительные номера пользователя {self.customer.get_full_name()}'
 
     class Meta:
         verbose_name = 'дополнительный номер'
@@ -86,7 +97,7 @@ class AdditionalEmail(models.Model):
     customer = models.ForeignKey(Customer, verbose_name='клиент', on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.email
+        return f'Дополнительные E-mail пользователя {self.customer.get_full_name()}'
 
     class Meta:
         verbose_name = 'дополнительный E-mail'
@@ -95,13 +106,13 @@ class AdditionalEmail(models.Model):
 
 class SocialNetwork(models.Model):
     customer = models.OneToOneField(Customer, verbose_name='клиент', on_delete=models.CASCADE)
-    instagram = models.URLField('instagram', max_length=255)
-    telegram = models.CharField('telegram', max_length=25)
-    whatsapp = models.CharField('whatsApp', max_length=25)
-    viber = models.CharField('viber', max_length=25)
+    instagram = models.URLField('instagram', max_length=255, blank=True, null=True)
+    telegram = models.CharField('telegram', max_length=25, blank=True, null=True)
+    whatsapp = models.CharField('whatsApp', max_length=25, blank=True, null=True)
+    viber = models.CharField('viber', max_length=25, blank=True, null=True)
 
     def __str__(self):
-        return f'Социальные сети пользователя {self.customer}'
+        return f'Социальные сети пользователя {self.customer.get_full_name()}'
 
     class Meta:
         verbose_name = 'социальная сеть'
@@ -129,4 +140,4 @@ class Facebook(models.Model):
 
     class Meta:
         verbose_name = 'facebook'
-        verbose_name_plural = 'Facebooks'
+        verbose_name_plural = 'Facebook'
