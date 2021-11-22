@@ -51,7 +51,7 @@ class Customer(User):
     status = models.IntegerField('статус', choices=StatusChoices.choices)
     status_changed_date = models.DateTimeField('дата изменения статуса', editable=False, default=timezone.now)
     type = models.IntegerField('тип', choices=TypeChoices.choices)
-    sex = models.IntegerField('пол', choices=SexChoices.choices)
+    sex = models.IntegerField('пол', choices=SexChoices.choices, default=SexChoices.UNKNOWN)
     timezone = TimeZoneField('часовой пояс', default='Europe/Moscow', choices_display='WITH_GMT_OFFSET')
 
     def __str__(self):

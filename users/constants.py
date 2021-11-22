@@ -28,5 +28,3 @@ class SexChoices(models.IntegerChoices):
     FEMALE = 2, 'Женский'
     UNKNOWN = 3, 'Неизвестно'
 
-    __empty__ = 'Выберите пол'
-
