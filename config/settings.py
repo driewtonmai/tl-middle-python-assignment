@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'phonenumber_field',
     'timezone_field',
+    'nested_inline',
 
     # local apps
     'users.apps.UsersConfig',
