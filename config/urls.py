@@ -4,6 +4,7 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/entities/', include('entities.urls')),
+    path('api/v1/users/', include('users.urls')),
 ]
 
 admin.site.site_header = "TL-Group Admin"
