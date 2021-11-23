@@ -28,3 +28,7 @@ class SexChoices(models.IntegerChoices):
     FEMALE = 2, 'Женский'
     UNKNOWN = 3, 'Неизвестно'
 
+
+CLIENT_CODE = '01'
+ENTITY_CODE = '02'
+DEPARTMENT_CODE = '03'

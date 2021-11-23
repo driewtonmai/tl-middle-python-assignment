@@ -8,7 +8,7 @@ from django.utils import timezone
 from phonenumber_field.modelfields import PhoneNumberField
 from timezone_field import TimeZoneField
 
-from .constants import TypeChoices, StatusChoices, SexChoices
+from .constants import TypeChoices, StatusChoices, SexChoices, CLIENT_CODE
 from .managers import UserManager
 
 
@@ -75,9 +75,9 @@ class Customer(User):
 
 
 @receiver(post_save, sender=Customer)
-def create_pub_id(sender, instance, created, **kwargs):
+def create_pub_id_for_customer(sender, instance, created, **kwargs):
     if created:
-        customer = Customer.objects.filter(id=instance.id).update(pub_id=f'{instance.id}01')
+        Customer.objects.filter(id=instance.id).update(pub_id=f'{instance.id}{CLIENT_CODE}')
 
 
 class AdditionalPhoneNumber(models.Model):
