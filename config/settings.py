@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'phonenumber_field',
     'timezone_field',
     'nested_inline',
+    'mptt',
 
     # local apps
     'users.apps.UsersConfig',

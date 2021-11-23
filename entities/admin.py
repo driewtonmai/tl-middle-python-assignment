@@ -1,10 +1,17 @@
 from django.contrib import admin
 
+from mptt.admin import DraggableMPTTAdmin
+from users.models import Customer
 from .models import Department, Entity, CustomerDepartmentThrough
 
 
-admin.site.register(CustomerDepartmentThrough)
-
+@admin.register(CustomerDepartmentThrough)
+class CustomerDepartmentThroughAdmin(admin.ModelAdmin):
+    fields = ('customer', 'department', 'date_joined')
+    readonly_fields = ('date_joined',)
+    list_display = ('customer', 'department', 'date_joined')
+    search_fields = ('customer', 'department')
+    list_filter = ('customer', 'department')
 
 class CustomerDepartmentThroughInline(admin.TabularInline):
     model = CustomerDepartmentThrough
@@ -20,13 +27,27 @@ class EntityAdmin(admin.ModelAdmin):
 
 
 @admin.register(Department)
-class DepartmentAdmin(admin.ModelAdmin):
-    fields = ('pub_id', 'name', 'entity')
+class DepartmentAdmin(DraggableMPTTAdmin):
+    mptt_indent_field = 'name'
+    fields = ('pub_id', 'name', 'entity', 'parent')
     readonly_fields = ('pub_id',)
-    list_display = ('pub_id', 'name', 'entity', 'get_count_of_customers')
+    list_display = ('indented_title', 'pub_id', 'entity', 'get_count_of_customers', 'tree_actions')
     inlines = [CustomerDepartmentThroughInline]
+    list_filter = ('name',)
+    search_fields = ('name',)
 
-    def get_count_of_customers(self, obj):
-        return obj.customers.count()
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        print(self)
+        qs = Department.objects.add_related_count(
+            qs,
+            Customer,
+            'department',
+            'customers_cumulative_count',
+            cumulative=True)
+        return qs
+
+    def get_count_of_customers(self, instance):
+        return instance.customers_cumulative_count
 
     get_count_of_customers.short_description = 'Количество клиентов'

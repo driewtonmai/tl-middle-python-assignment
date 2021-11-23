@@ -2,6 +2,8 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+from mptt.models import MPTTModel, TreeForeignKey
+
 from users.constants import ENTITY_CODE, DEPARTMENT_CODE
 from users.models import Customer
 
@@ -30,18 +32,28 @@ def create_pub_id_for_entity(sender, instance, created, **kwargs):
         Entity.objects.filter(id=instance.id).update(pub_id=f'{instance.id}{ENTITY_CODE}')
 
 
-class Department(models.Model):
+class Department(MPTTModel):
     pub_id = models.CharField('идентификатор юр. лица', max_length=50, editable=False)
     name = models.CharField('название', max_length=255)
     entity = models.ForeignKey(Entity, verbose_name='юр. лицо', on_delete=models.PROTECT)
     customers = models.ManyToManyField(Customer, verbose_name='клиенты', through='CustomerDepartmentThrough')
+    parent = TreeForeignKey('self', blank=True, null=True, related_name='children', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        print(args)
+        print(kwargs)
+        print(self)
+
     class Meta:
         verbose_name = 'департамент'
         verbose_name_plural = 'Департаменты'
+
+    class MPTTMeta:
+        order_insertion_by = ['name']
 
 
 @receiver(post_save, sender=Department)
@@ -57,3 +69,8 @@ class CustomerDepartmentThrough(models.Model):
 
     def __str__(self):
         return f'{self.customer} {self.department}'
+
+    class Meta:
+        ordering = ['-date_joined']
+        verbose_name = 'дата добавления клиента'
+        verbose_name_plural = 'Даты добавления клиентов'
