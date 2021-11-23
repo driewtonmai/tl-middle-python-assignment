@@ -37,6 +37,7 @@ INSTALLED_APPS = [
 
     # local apps
     'users.apps.UsersConfig',
+    'entities.apps.EntitiesConfig',
 ]
 
 MIDDLEWARE = [
