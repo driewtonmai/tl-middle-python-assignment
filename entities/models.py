@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -6,6 +7,8 @@ from mptt.models import MPTTModel, TreeForeignKey
 
 from users.constants import ENTITY_CODE, DEPARTMENT_CODE
 from users.models import Customer
+
+from .constants import MAX_TREE_DEPTH
 
 
 class Entity(models.Model):
@@ -47,6 +50,11 @@ class Department(MPTTModel):
         print(args)
         print(kwargs)
         print(self)
+
+    def clean(self):
+        parent_level = self.parent.get_level()
+        if parent_level + 1 >= MAX_TREE_DEPTH:
+            raise ValidationError({'parent': f'Максимальная глубина дерева {MAX_TREE_DEPTH} была достигнута'})
 
     class Meta:
         verbose_name = 'департамент'

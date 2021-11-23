@@ -13,6 +13,7 @@ class CustomerDepartmentThroughAdmin(admin.ModelAdmin):
     search_fields = ('customer', 'department')
     list_filter = ('customer', 'department')
 
+
 class CustomerDepartmentThroughInline(admin.TabularInline):
     model = CustomerDepartmentThrough
     extra = 1
