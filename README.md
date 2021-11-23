@@ -20,7 +20,7 @@ source env/bin/activate`
 * Create admin account
 `python manage.py createsuperuser`
 * Load data from fixture
-`python manage.py loaddata databasedump.json`
+`python manage.py loaddata database.dump.json`
 * Start the development server
 `python manage.py runserver`
 
