@@ -45,12 +45,6 @@ class Department(MPTTModel):
     def __str__(self):
         return self.name
 
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        print(args)
-        print(kwargs)
-        print(self)
-
     def clean(self):
         parent_level = self.parent.get_level()
         if parent_level + 1 >= MAX_TREE_DEPTH:
