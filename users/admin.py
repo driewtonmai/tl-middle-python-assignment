@@ -58,7 +58,7 @@ class CustomerAdmin(NestedModelAdmin):
     date_hierarchy = 'date_joined'
     fields = ('pub_id', 'phone', 'email', 'first_name', 'last_name',
               'patronymic', 'status', 'status_changed_date', 'type', 'sex',
-              'timezone', 'last_login', 'date_joined', 'is_active', 'is_staff')
+              'timezone', 'entity', 'last_login', 'date_joined', 'is_active', 'is_staff')
     readonly_fields = ('pub_id', 'last_login', 'date_joined', 'status_changed_date')
     inlines = [AdditionalEmailInline, AdditionalPhoneNumberInline, SocialNetworkInline]
     list_display = ('pub_id', 'last_name', 'first_name', 'patronymic', 'phone', 'email')

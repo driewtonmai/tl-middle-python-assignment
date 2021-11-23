@@ -53,6 +53,7 @@ class Customer(User):
     type = models.IntegerField('тип', choices=TypeChoices.choices)
     sex = models.IntegerField('пол', choices=SexChoices.choices, default=SexChoices.UNKNOWN)
     timezone = TimeZoneField('часовой пояс', default='Europe/Moscow', choices_display='WITH_GMT_OFFSET')
+    entity = models.ForeignKey('entities.Entity', verbose_name='юр. лицо', on_delete=models.PROTECT, null=True)
 
     def __str__(self):
         return self.pub_id
