@@ -1,6 +1,8 @@
 asgiref==3.4.1
 coverage==6.1.2
 Django==3.2.9
+django-js-asset==1.2.2
+django-mptt==0.13.4
 django-nested-inline==0.4.4
 django-phonenumber-field==6.0.0
 django-timezone-field==4.2.1

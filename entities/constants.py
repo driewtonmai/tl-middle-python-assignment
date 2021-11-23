@@ -1,0 +1,1 @@
+MAX_TREE_DEPTH = 6
